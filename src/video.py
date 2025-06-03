@@ -17,24 +17,32 @@ class Video:
             time.sleep(delay)
         return None
     
-    def displayRaw(self, cap, resolution=3, display=0.5):
+    def displayRaw(self, cap, resolution=3, displayScale=0.5):
 
         frameCount = 0
-        while cap.isOpen():
+        while cap.isOpened():
             ret, frame = cap.read()
-            if frameCount % resolution ==0:
+            if frameCount % resolution == 0:
 
-                h, w = frame.shape[:2]
-                # print(h, w)
-                h = int(h * displayScale)
-                w = int(w * displayScale)
+                if frameCount == 0:
+                    h, w = frame.shape[:2]
+                    # print(h, w)
+                    h = int(h * displayScale)
+                    w = int(w * displayScale)
+
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
             
                 cv2.namedWindow('video feed', cv2.WINDOW_NORMAL)
                 cv2.resizeWindow('video feed', w, h)
-                cv2.imshow('video feed', undImg)
+                cv2.imshow('video feed', frame)
+            frameCount += 1
+        cap.release()
+        cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     vid = Video(index=1)
-    cap = vid.open_camera(1)
-    
+    cap = vid.open_camera()
+    vid.displayRaw(cap)
     # cap = cv2.VideoCapture(self.cap, cv2.CAP_DSHOW)
